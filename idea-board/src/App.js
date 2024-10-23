@@ -929,7 +929,7 @@ idea: { "Title": "アイデアの種の英語タイトル（短い単語やフ�
           <div className="progress-indicator">Loading...</div>
         </div>
       )}
-      {/* <Header /> */}
+      <Header />
       <Sidebar
         addStickyNote={addStickyNote}
         sendToLLM={sendToLLM}

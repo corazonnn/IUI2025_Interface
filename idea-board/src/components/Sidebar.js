@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDrag } from 'react-dnd';
-
+import i18next from '../i18n'; // 追加
+import react_i18next from 'i18next';
 
 const Sidebar = ({
   addStickyNote,
@@ -16,6 +17,9 @@ const Sidebar = ({
   generateEmptyIdea,
   generateEmptySeed,
 }) => {
+  // const { t } = useTranslation(); // 翻訳関数を取得
+  const [languageChanged, setLanguageChanged] = useState(false);
+
   const [isOpen, setIsOpen] = useState(true);  // デフォルトで開いた状態に設定
   const [llmCommand, setLlmCommand] = useState('');
   // const [theme, setLocalTheme] = useState('10年後のコンビニエンスストアはどのように進化しているだろうか？'); // お題のデフォルト
@@ -96,12 +100,25 @@ const Sidebar = ({
     }
   }, [measurementActive]);
 
+  useEffect(() => {
+    const handleLanguageChanged = () => {
+      setLanguageChanged(prevState => !prevState);
+    };
+
+    react_i18next.on('languageChanged', handleLanguageChanged);
+
+    // クリーンアップ関数でイベントリスナーを解除
+    return () => {
+      react_i18next.off('languageChanged', handleLanguageChanged);
+    };
+  }, []);
+
   return (
     <div style={{
       position: 'fixed',
       top: '30px',  // Headerの高さに合わせて配置
       left: '10px',  // 左端から少し離す
-      height: '70vh', // 高さを調整 height: '700px',
+      height: '90vh', // 高さを調整 height: '700px',
       width: isOpen ? '350px' : '50px',  // 閉じた状態でも幅を残してボタンを表示
       backgroundColor: '#ffffff',  // 背景色をグレーに
       color: 'black',
@@ -147,7 +164,7 @@ const Sidebar = ({
             boxSizing: 'border-box', // パディングを含めて高さを計算
           }}
         >
-          <h3 style={{ marginBottom: '0px' }}>Theme</h3>
+          <h3 style={{ marginBottom: '0px' }}>{i18next.t('Theme')}</h3>
           <hr style={{
             border: 'none',  // デフォルトの境界線を消す
             borderTop: '1px solid #ddd',  // グレーの線を上部に追加
@@ -187,13 +204,13 @@ const Sidebar = ({
             placeholder="お題を入力してください..."
           /> */}
           {/* 新しい付箋の作成、以下の付箋をキャンバス内にドラッグ&ドロップして新しい付箋を追加しよう */}
-          <h3 style={{ marginBottom: '0px' }}>Create a new sticky note</h3>
+          <h3 style={{ marginBottom: '0px' }}>{i18next.t('Create a new sticky note')}</h3>
           <hr style={{
             border: 'none',  // デフォルトの境界線を消す
             borderTop: '1px solid #ddd',  // グレーの線を上部に追加
             marginBottom: '10px',  // 上下の余白
           }} />
-          <div style={{ marginBottom: '10px', fontSize: '12px' }}>Drag and drop the following sticky note into the canvas to add a new one</div>
+          <div style={{ marginBottom: '10px', fontSize: '12px' }}>{i18next.t('Create Function Description')}</div>
           {/* 見本の付箋を横並びに配置 */}
           <div style={{
             display: 'flex',  // 横並びに配置
@@ -222,7 +239,7 @@ const Sidebar = ({
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'} // ホバーで拡大
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-              {isGenerating ? '...' : 'Ideas'}
+              {isGenerating ? '...' : i18next.t('Ideas')}
             </div>
             {/* 見本の付箋（circle） */}
             <div  ref={dragSeedNote} style={{
@@ -245,7 +262,7 @@ const Sidebar = ({
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'} // ホバーで拡大
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-              {isGenerating ? '...' : 'Elements'}
+              {isGenerating ? '...' : i18next.t('Elements')}
             </div>
           </div>
           <div style={{
@@ -263,20 +280,18 @@ const Sidebar = ({
             whiteSpace: 'pre-wrap',  // テキストの改行を保持
             fontSize: '12px',
           }}>
-            <strong>Ideas:</strong> Concrete solutions to the topic<br />
-            <strong>Elements:</strong> New perspectives or inspiration for idea generation (e.g., well-being, empathy, environmental consideration...)
+            <strong>{i18next.t('Ideas')}:</strong> {i18next.t('Ideas Description')}<br />
+            <strong>{i18next.t('Elements')}:</strong> {i18next.t('Elements Description')}
           </div>
-          {/* お題に対する具体的な解決策
-          アイデア発想のための新しい視点やインスピレーション（例: ウェルビーイング、共感、環境配慮...） */}
           {/* AIによるアイデア生成
           以下の付箋をキャンバス内にドラッグ&ドロップしてAIアイデアを追加しよう */}
-          <h3 style={{ marginBottom: '0px' }}>AI-generated ideas</h3>
+          <h3 style={{ marginBottom: '0px' }}>{i18next.t('AI-generated ideas')}</h3>
           <hr style={{
             border: 'none',  // デフォルトの境界線を消す
             borderTop: '1px solid #ddd',  // グレーの線を上部に追加
             marginBottom: '10px',  // 上下の余白
           }} />
-          <div style={{ marginBottom: '10px', fontSize: '12px' }}>Drag and drop the following sticky note into the canvas to add an AI-generated idea</div>
+          <div style={{ marginBottom: '10px', fontSize: '12px' }}>{  i18next.t('Drag and drop the following sticky note into the canvas to add an AI-generated idea')}</div>
           {/* 見本の付箋を横並びに配置 */}
           <div style={{
             display: 'flex',  // 横並びに配置
@@ -305,7 +320,7 @@ const Sidebar = ({
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'} // ホバーで拡大
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-              {isGenerating ? '...' : 'Ideas'}
+              {isGenerating ? '...' : i18next.t('Ideas')}
             </div>
             {/* 見本の付箋（circle） */}
             <div ref={dragAISeed} style={{
@@ -328,8 +343,72 @@ const Sidebar = ({
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'} // ホバーで拡大
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-              {isGenerating ? '...' : 'Elements'}
+              {isGenerating ? '...' : i18next.t('Elements')}
             </div>
+          </div>
+          {/* 実験の計測セクション */}
+          <h3 style={{ marginBottom: '0px' }}>{i18next.t('Measurement of experiment')}</h3>
+          <hr
+            style={{
+              border: 'none',
+              borderTop: '1px solid #ddd',
+              marginBottom: '10px',
+            }}
+          />
+          <div style={{ marginBottom: '10px' }}>
+            <label>
+              {i18next.t('Name')}
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  marginTop: '5px',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </label>
+          </div>
+          <div style={{ marginBottom: '10px' }}>
+            <button
+              onClick={() => onStartMeasurement(name)} // 氏名を渡して計測開始
+              style={{
+                padding: '10px',
+                marginRight: '10px',
+                cursor: 'pointer',
+              }}
+            >
+              {i18next.t('Start measurement')}
+            </button>
+            <button
+              onClick={onEndMeasurement}
+              style={{ padding: '10px', cursor: 'pointer' }}
+            >
+              {i18next.t('End measurement')}
+            </button>
+          </div>
+
+          {/* カウント結果の表示 */}
+          <div
+            style={{
+              backgroundColor: '#F8F9FA',
+              padding: '10px',
+              borderRadius: '5px',
+              marginBottom: '20px',
+              fontSize: '12px',
+            }}
+          >
+            <h4>{i18next.t('Count results')}</h4>
+            <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+              <li>{i18next.t('Number of idea combinations')}: {counts.combineStickyNotes}</li>
+              <li>{i18next.t('Number of idea decompositions')}: {counts.handleResize}</li>
+              <li>{i18next.t('Number of AI idea generations')}: {counts.generateNewIdea}</li>
+              <li>{i18next.t('Number of AI element generations')}: {counts.generateIdeaSeeds}</li>
+              <li>{i18next.t('Number of new idea sticky notes added')}: {counts.addStickyNote}</li>
+              <li>{i18next.t('Number of new element sticky notes added')}: {counts.addSeedNote}</li>
+            </ul>
           </div>
         </div>
       )}
@@ -341,70 +420,6 @@ export default Sidebar;
 
 
 
-// {/* 実験の計測セクション */}
-//           <h3 style={{ marginBottom: '0px' }}>実験の計測</h3>
-//           <hr
-//             style={{
-//               border: 'none',
-//               borderTop: '1px solid #ddd',
-//               marginBottom: '10px',
-//             }}
-//           />
-//           <div style={{ marginBottom: '10px' }}>
-//             <label>
-//               氏名:
-//               <input
-//                 type="text"
-//                 value={name}
-//                 onChange={(e) => setName(e.target.value)}
-//                 style={{
-//                   width: '100%',
-//                   padding: '8px',
-//                   marginTop: '5px',
-//                   boxSizing: 'border-box',
-//                 }}
-//               />
-//             </label>
-//           </div>
-//           <div style={{ marginBottom: '10px' }}>
-//             <button
-//               onClick={() => onStartMeasurement(name)} // 氏名を渡して計測開始
-//               style={{
-//                 padding: '10px',
-//                 marginRight: '10px',
-//                 cursor: 'pointer',
-//               }}
-//             >
-//               計測開始
-//             </button>
-//             <button
-//               onClick={onEndMeasurement}
-//               style={{ padding: '10px', cursor: 'pointer' }}
-//             >
-//               計測終了
-//             </button>
-//           </div>
-
-//           {/* カウント結果の表示 */}
-//           <div
-//             style={{
-//               backgroundColor: '#F8F9FA',
-//               padding: '10px',
-//               borderRadius: '5px',
-//               marginBottom: '20px',
-//               fontSize: '12px',
-//             }}
-//           >
-//             <h4>カウント結果</h4>
-//             <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
-//               <li>アイデア結合回数: {counts.combineStickyNotes}</li>
-//               <li>アイデア分解回数: {counts.handleResize}</li>
-//               <li>AIアイデア生成回数: {counts.generateNewIdea}</li>
-//               <li>AI要素生成回数: {counts.generateIdeaSeeds}</li>
-//               <li>新しいアイデア付箋追加数: {counts.addStickyNote}</li>
-//               <li>新しい要素付箋追加数: {counts.addSeedNote}</li>
-//             </ul>
-//           </div>
 
 
           
