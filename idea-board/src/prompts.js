@@ -1,7 +1,7 @@
 
 // ######################   アイデアの結合プロンプト ######################
 
-export const combineIdeasPrompt = (theme, draggedNote, targetNote) => `
+export const combineIdeasPrompt = (theme, draggedNote, targetNote, lng) => `
 次のタスクでは、与えられたお題:「${theme}」に対して、2つのアイデア（アイデアAとアイデアB）を組み合わせて、新しいアイデアを1つ生成してください。
 
 ### タスクの目的
@@ -21,8 +21,8 @@ ${theme}
 - どちらか一方に偏らず、両方のアイデアがうまく融合したアイデアを作り出してください。
 
 ### 出力フォーマット
-出力は英語で、以下のフォーマットに従ってください。
-idea: { "Title": "新しいアイデアの英語タイトル（具体的かつ短い文章）", "Description": "新しいアイデアの詳細な説明（1～3文）" }
+出力は${lng}で、以下のフォーマットに従ってください。
+idea: { "Title": "新しいアイデアの${lng}タイトル（具体的かつ短い文章）", "Description": "新しいアイデアの詳細な説明（1～3文）" }
 
 ### 出力例
 - アイデアA: { "Title": "バーチャル観戦", "Description": "スマホを使ってアトラクションの様子をリアルタイムで観戦できるサービス" }
@@ -38,7 +38,7 @@ idea: { "Title": "待ち時間中にスマホでクイズ観戦を楽しむ", "D
 `;
 
 // ######################   アイデアの生成プロンプト ######################
-export const generateNewIdeaPrompt = (theme, existingIdeasTitles) => `
+export const generateNewIdeaPrompt = (theme, existingIdeasTitles, lng) => `
 次のタスクでは、与えられたお題に基づいて、これまでに出てきたアイデアと異なる新しいアイデアを1つ生成してください。
 
 ### タスクの目的
@@ -55,8 +55,8 @@ ${theme}
 - 既存のアイデアと重複しない新しいアイデアを提案してください。
 
 ### 出力フォーマット
-アイデアは英語で、次のフォーマットに従って出力してください。
-idea: { "Title": "アイデアのタイトル（英語）", "Description": "アイデアの詳細な説明（1～3文）" }
+アイデアは${lng}で、次のフォーマットに従って出力してください。
+idea: { "Title": "アイデアのタイトル（${lng}）", "Description": "アイデアの詳細な説明（1～3文）" }
 
 ### 出力例
 - お題: 「子供たちが自然の中で学べる新しい遊びを考えてください」
@@ -68,7 +68,7 @@ idea: { "Title": "アイデアのタイトル（英語）", "Description": "ア�
 
 // ######################   アイデアの分解プロンプト ######################
 
-export const decomposeIdeaPrompt = (noteContent, noteDescription) => `
+export const decomposeIdeaPrompt = (noteContent, noteDescription, lng) => `
 次のタスクでは、入力アイデアに含まれる抽象的な「概念」を最大3つ抽出し、それぞれをTitle（英語タイトル）とDescription（英語の説明）に分けて出力してください。
 
 ### タスクの目的
@@ -79,12 +79,12 @@ export const decomposeIdeaPrompt = (noteContent, noteDescription) => `
 - Description（説明）: タイトルをより具体的に説明する一文または短い説明。例：「他者の感情や体験を共有することで、互いに理解し合うこと」「リアルタイムでの体験を全員で共有し、一緒に楽しむ」
 
 ### 出力フォーマット
-出力は英語で、以下のフォーマットに従ってください。概念が3つ未満の場合は、存在する分だけ列挙してください。
+出力は${lng}で、以下のフォーマットに従ってください。概念が3つ未満の場合は、存在する分だけ列挙してください。
 concepts: [ { "Title": "Title1", "Description": "Description1" }, { "Title": "Title2", "Description": "Description2" }, { "Title": "Title3", "Description": "Description3" } ]
 
 ### 出力例
-- アイデア: 「誰もが自由に意見を共有し、共感し合うオンラインプラットフォーム（英語）」
-- 出力: concepts: [ { "Title": "自由な意見交換（英語）", "Description": "誰もが自分の意見を自由に表現できること（英語）" }, { "Title": "共感", "Description": "他者の意見や感情に対して理解を深めること" }, { "Title": "交流", "Description": "さまざまな人々と意見を共有し合うこと" } ]
+- アイデア: 「誰もが自由に意見を共有し、共感し合うオンラインプラットフォーム（${lng}）」
+- 出力: concepts: [ { "Title": "自由な意見交換（${lng}）", "Description": "誰もが自分の意見を自由に表現できること（${lng}）" }, { "Title": "共感", "Description": "他者の意見や感情に対して理解を深めること" }, { "Title": "交流", "Description": "さまざまな人々と意見を共有し合うこと" } ]
 
 ### 入力アイデア
 アイデア: ${noteContent}${noteDescription ? ` - ${noteDescription}` : ""}
@@ -95,7 +95,7 @@ concepts: [ { "Title": "Title1", "Description": "Description1" }, { "Title": "Ti
 
 // ######################   要素アイデアの生成プロンプト ######################
 
-export const generateIdeaSeedPrompt = (theme, existingConceptsTitles) => `
+export const generateIdeaSeedPrompt = (theme, existingConceptsTitles, lng) => `
 次のタスクでは、与えられたお題に基づいて、これまでに出てきた要素と重複しない新しい**「アイデアの種」**を1つ生成してください。
 
 ### タスクの目的
@@ -126,8 +126,8 @@ ${theme}
 - Description（説明）: タイトルをより具体的に説明する一文または短い説明。例：「他者の感情や体験を共有することで、互いに理解し合うこと」「リアルタイムでの体験を全員で共有し、一緒に楽しむ」
 
 ### 出力フォーマット
-アイデアは英語で、次のフォーマットに従って出力してください。
-idea: { "Title": "アイデアの種の英語タイトル（短い単語やフレーズ）", "Description": "アイデアの種の詳細な説明（1～3文）" }
+アイデアは${lng}で、次のフォーマットに従って出力してください。
+idea: { "Title": "アイデアの種の${lng}タイトル（短い単語やフレーズ）", "Description": "アイデアの種の詳細な説明（1～3文）" }
 
 **注意:** 出力フォーマットに厳密に従い、指定された要件を満たす「アイデアの種」を1つ提案してください。
 `;

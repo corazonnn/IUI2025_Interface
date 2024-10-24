@@ -52,7 +52,11 @@ function App() {
     addSeedNote: 0,
   });
 
+  // 言語設定の検知のため
   const [languageChanged, setLanguageChanged] = useState(false);
+
+  // 現在の言語を取得
+  const currentLanguage = i18next.language;
 
   const [, dropRef] = useDrop({
     accept: ['STICKY_NOTE','AI_IDEA'],
@@ -140,6 +144,7 @@ function App() {
     setIdCounter(idCounter + 1);
   };
 
+  // ######################   アイデアの結合 ######################
   // 異なる付箋をドラッグ&ドロップした際に、両方の内容を結合した新しい付箋を作成
   const combineStickyNotes = async (draggedNote, targetNote) => {
     const isAlreadyCombined = notes.some(note =>
@@ -168,8 +173,9 @@ function App() {
     // PENDING: DBに新しい付箋を保存する、現状の付箋だと枚数が増えると文字が消えてきたりするから?
     setLoading(true); // Start the loading indicator
 
-    console.log(theme);
-    const combinedContent = combineIdeasPrompt(theme, draggedNote, targetNote);
+    // 指示プロンプト作成
+    const language = i18next.language === 'en' ? '英語' : '日本語';
+    const combinedContent = combineIdeasPrompt(theme, draggedNote, targetNote, language);
 
     try {
       // draggedNote と targetNote の位置を少し離す処理を追加
@@ -409,6 +415,7 @@ function App() {
     };
   }, []);
 
+  // ######################   アイデアの分解 ######################
   const handleResize = async (id, newHeight) => {
     
     if (resizedNotes.includes(id)) { 
@@ -433,7 +440,8 @@ function App() {
     setResizedNotes([...resizedNotes, id]); // リサイズされたIDを追加
 
     // 2. LLMにリクエストを送信して内容を構成要素に分解する
-    const command = decomposeIdeaPrompt(note.content, note.description);
+    const language = i18next.language === 'en' ? '英語' : '日本語';
+    const command = decomposeIdeaPrompt(note.content, note.description, language);
 
     try {
       const responseText = await sendToLLM(command);
@@ -502,6 +510,7 @@ function App() {
     setSelectedNoteId(id); // クリックされた付箋のIDを保存
   };
 
+  // ######################   アイデアの生成 ######################
   // AIによる新しいアイデアを生成する関数
   const generateNewIdea = async (x = 450, y = 100) => {
     console.log('AIによるアイデア生成を開始します...');
@@ -511,7 +520,8 @@ function App() {
     const existingIdeasTitles = generatedIdeas.map(idea => idea.Title);
     // console.log(generatedIdeas);
 
-    const command = generateNewIdeaPrompt(theme, existingIdeasTitles);
+    const language = i18next.language === 'en' ? '英語' : '日本語';
+    const command = generateNewIdeaPrompt(theme, existingIdeasTitles, language);
 
     try {
       const responseText = await sendToLLM(command);
@@ -547,7 +557,7 @@ function App() {
   };
 
 
-
+  // ######################   要素アイデアの生成 ######################
   const generateIdeaSeeds = async (x = 450, y = 100) => {
     console.log('AIによるアイデアの種生成を開始します...');
     setLoading(true); // Start the loading indicator
@@ -555,7 +565,8 @@ function App() {
     // 既存のコンセプトのタイトルをリスト化
     const existingConceptsTitles = generatedConcepts.map(concept => concept.Title);
 
-    const command = generateIdeaSeedPrompt(theme, existingConceptsTitles);
+    const language = i18next.language === 'en' ? '英語' : '日本語';
+    const command = generateIdeaSeedPrompt(theme, existingConceptsTitles, language);
 
     try {
       const responseText = await sendToLLM(command);
