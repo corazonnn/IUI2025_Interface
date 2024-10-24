@@ -27,6 +27,8 @@ const resources = {
       'Number of AI element generations': 'AI element generations',
       'Number of new idea sticky notes added': 'new idea sticky notes added',
       'Number of new element sticky notes added': 'new element sticky notes added',
+      'Relationship Combine': 'Combine',
+      'Relationship Decompose': 'Decompose',
       // 他の必要な翻訳キーをここに追加
     },
   },
@@ -52,6 +54,8 @@ const resources = {
       'Number of AI element generations': 'AI要素生成回数',
       'Number of new idea sticky notes added': '新しいアイデア付箋追加数',
       'Number of new element sticky notes added': '新しい要素付箋追加数',
+      'Relationship Combine': '結合',
+      'Relationship Decompose': '分解',
       // 他の必要な翻訳キーをここに追加
     },
   },

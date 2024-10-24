@@ -32,14 +32,6 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
   }, [id]);
 
 
-  // シェイク検知のための状態
-  const [lastX, setLastX] = useState(x); // 最後に付箋が移動したX座標
-  const [shakeCount, setShakeCount] = useState(0); // シェイクの回数
-  const [lastDirection, setLastDirection] = useState(null); // "left" or "right" 
-  const shakeThreshold = 50; // シェイクを検知する閾値
-  const requiredShakes = 4; // シェイクを検知するために必要な回数
-  const targetXRef = useRef(null); // 目印の参照
-
 
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: 'STICKY',
@@ -49,19 +41,6 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
     }),
   }), [x, y]);
 
-  // LEGOブロックの下の要素の分離に使ってたコード
-  // const [{ isDragging: isDraggingHandle }, dragHandle] = useDrag(() => ({
-  //   type: 'HANDLE',
-  //   item: { id },
-  //   end: (item, monitor) => {
-  //     if (!monitor.didDrop()) {
-  //       onDetach(id); // ドラッグ終了時にonDetachが呼ばれる
-  //     }
-  //   },
-  //   collect: (monitor) => ({
-  //     isDragging: monitor.isDragging(),
-  //   }),
-  // }));
 
   const [{ isOver }, drop] = useDrop(() => ({
   accept: 'STICKY',
@@ -71,7 +50,6 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
       }
     },
     collect: (monitor) => ({
-      // isOver: monitor.isOver(),
       isOver: monitor.isOver() && monitor.getItem().id !== id, // 自分自身には重ならないようにする
     }),
   }), [id]);
@@ -127,44 +105,9 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
     const correctedY = currentOffset.y + scrollTop;
       
     onMove(id, correctedX, correctedY);
-    // onMove(id, currentOffset.x, currentOffset.y);
-      
-
-    // shake検知のための処理（いずれ消す↓）
-    // const currentX = currentOffset.x + correctedX;
-    // const deltaX = currentX - lastX;
-
-
-    // // 左右の方向を決定
-    // let currentDirection = null;
-    // if (deltaX > shakeThreshold) {
-    //   currentDirection = 'right';
-    // } else if (deltaX < -shakeThreshold) {
-    //   currentDirection = 'left';
-    // }
-
-    // // 振る動作の検知
-    // if (currentDirection && currentDirection !== lastDirection) {
-    //   setShakeCount((prev) => prev + 1);
-    //   setLastDirection(currentDirection);
-    //   setLastX(currentX);
-    // }
-    // // 振る動作が2往復（左右に4回）を超えたら検知
-    // if (shakeCount >= requiredShakes) {
-    //   onShakeDetected(id);  // 親コンポーネントに振ったことを通知
-    //   setShakeCount(0);  // 振りのカウントをリセット
-    // }
   }
-}, [isDragging, currentOffset, lastX, shakeCount]);
+}, [isDragging, currentOffset]);
 
-
-  // ドラッグが終了したらカウントをリセット
-  React.useEffect(() => {
-    if (!isDragging) {
-      setShakeCount(0);
-      setLastDirection(null);
-    }
-  }, [isDragging]);
 
   React.useEffect(() => {
     if (isDragging) {
@@ -361,20 +304,6 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
             {noteContent}
           </div>
       )}
-      {/* {isDragging && lastX && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '0%',
-            left: `${lastX - x + 100}px`, // `lastX` の位置に赤い点を表示
-            width: '5px',
-            height: '5px',
-            backgroundColor: '#CBCBCB',
-            borderRadius: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        />
-      )} */}
       {/* リサイズハンドルを白い丸に変更し、リサイズ操作に対応 */}
       {isSelected && shape !== 'circle' && (
         <div
