@@ -502,10 +502,6 @@ function App() {
     }
   };
 
-  const handleDetach = (id) => {
-    console.log(`Note ${id}'s detachable element was dragged away.`);
-  };
-
   const handleNoteClick = (id) => {
     setSelectedNoteId(id); // クリックされた付箋のIDを保存
   };
@@ -792,7 +788,6 @@ function App() {
               onContentChange={updateNoteContent}  // 付箋内容の変更を反映する
               onClick={handleNoteClick}  // クリックイベントを渡す
               isSelected={note.id === selectedNoteId}  // 選択されているかどうかを渡す
-              onDetach={handleDetach}
               onResize={handleResize} // リサイズ情報を受け取るコールバック関数を渡す
               resetResize={() => setResizedNotes([])} // 別の付箋がリサイズされた際にリセット
             />

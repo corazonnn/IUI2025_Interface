@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 // 1.付箋のシェイク（マジシャンみたいに付箋を振ったら内容が変化する）
 // 2.付箋の分離（LEGOブロックを取り外す際に実装した）
 
-const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, bkcolor, onContentChange, shape, onShakeDetected, isSelected, onClick, onDetach, onResize, resetResize, borderLine }) => {
+const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, bkcolor, onContentChange, shape, onShakeDetected, isSelected, onClick, onResize, resetResize, borderLine }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState(content);
   const [zIndex, setZIndex] = useState(1);  // 初期状態のz-indexは低い値に設定
@@ -240,7 +240,7 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
         width: `${width}px`, // width を状態から取得
         height: `${height}px`, // 高さを状態から取得
         borderRadius: shape === 'circle' ? '50%' : '50%',  // 丸い付箋にするための設定
-        border: (isSelected || isDragging) ? '6px solid #B972FF' : borderLine ? borderLine :  'none', // #3859FF  
+        border: (isSelected || isDragging) ? '6px solid #E0C1FF' : borderLine ? borderLine : 'none', // #3859FF  // 元：B972FF
         opacity: isDragging ? 0.8 : 1,
         // padding: (shape === 'square') ? '20px 20px 20px 20px' : '20px',
         padding:'0px',
