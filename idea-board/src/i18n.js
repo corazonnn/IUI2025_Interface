@@ -29,7 +29,8 @@ const resources = {
       'Number of new element sticky notes added': 'new element sticky notes added',
       'Relationship Combine': 'Combine',
       'Relationship Decompose': 'Decompose',
-      'isReducingModeActive Alert': 'You cannot add new sticky notes while in reduction mode. Please press the confirm button',
+      'isReducingModeActive Alert': 'You cannot add new sticky notes while in reduction mode. Please press the DONE button',
+      'DONE button' : 'Done',
       // 他の必要な翻訳キーをここに追加
     },
   },
@@ -58,6 +59,7 @@ const resources = {
       'Relationship Combine': '結合',
       'Relationship Decompose': '分解',
       'isReducingModeActive Alert': '削減モード中は新しい付箋を追加できません。確定ボタンを押してください。',
+      'DONE button' : '確定',
       // 他の必要な翻訳キーをここに追加
     },
   },

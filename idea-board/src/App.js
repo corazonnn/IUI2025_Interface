@@ -994,7 +994,7 @@ function App() {
                     fontSize: '14px'
                   }}
                 >
-                  確定
+                  {i18next.t('DONE button')}
                 </button>
               </div>
             </div>
