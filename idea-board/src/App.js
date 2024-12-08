@@ -13,6 +13,7 @@ import {
   decomposeIdeaPrompt,
   generateIdeaSeedPrompt,
   generateIdeaOnShakePrompt,
+  rebuildIdeaPrompt,
 } from './prompts'; // プロンプトをインポート
 
 
@@ -98,6 +99,19 @@ function App() {
     }
   }
 
+
+  // 削減モード中かどうかの判定
+  const handleIfReducingModeActive = () => {
+    if (isReducingModeActive) {
+      console.log(i18next.t('isReducingModeActive Alert'));
+      setAlertMessage(i18next.t('isReducingModeActive Alert'));
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+      return true; // 削減モード中であることを示す
+    }
+    return false; // 削減モード中でなければfalseを返す
+  };
+
   const generateEmptySeed = (correctX, correctY) => { 
     addSeedNote("", "", '#9EDCFA', correctX, correctY);
 
@@ -112,6 +126,9 @@ function App() {
 
 
   const addStickyNote = (content = "", description = "", bkcolor = '#FCF281', x = 450, y = 100, borderLine = 'none') => {
+    
+    if (handleIfReducingModeActive()) return; // trueが返ってきたらここで処理中断
+
     const newNote = {
       id: idCounter,
       content,
@@ -129,6 +146,8 @@ function App() {
 
     // 丸いアイデアの種を追加する関数
   const addSeedNote = (content = "", description = "", bkcolor = '#9EDCFA', x = 450, y = 100, borderLine = 'none') => {
+    if (handleIfReducingModeActive()) return; // trueが返ってきたらここで処理中断
+
     const newNote = {
       id: idCounter,
       content,
@@ -152,6 +171,8 @@ function App() {
         note.sourceIds.includes(draggedNote.id) &&
         note.sourceIds.includes(targetNote.id)
     );
+
+    if (handleIfReducingModeActive()) return; // trueが返ってきたらここで処理中断
 
     if (isAlreadyCombined) {
       console.log("This idea has already been combined.");// このアイデアは既に組み合わされています。
@@ -417,6 +438,7 @@ function App() {
 
   // ######################   アイデアの分解 ######################
   const handleResize = async (id, newHeight) => {
+    if (handleIfReducingModeActive()) return; // trueが返ってきたらここで処理中断
     
     if (resizedNotes.includes(id)) { 
       setAlertMessage("This idea has already been decomposed."); // このアイデアは既に分解されています。
@@ -470,10 +492,18 @@ function App() {
           y: note.y + 150,
           bkcolor: '#9EDCFA',
           shape: 'circle', // 丸い付箋として追加,
-          borderLine: '2px solid #000000'
+          borderLine: '2px solid #000000',
+          isReducing: true // ★追加：この要素は削減モード対象
         };
       });
       // アイデアの分解 2C99FF
+
+      // 元のアイデア付箋にもisReducingを付与
+      const updatedNotes = notes.map(n => 
+        n.id === id ? { ...n, isReducing: true } : n
+      );
+
+      setNotes(updatedNotes); // 変更を保存
 
       // 5. 既存の付箋に新しい付箋を追加して状態を更新
       setNotes((prevNotes) => [...prevNotes, ...newNotes]);
@@ -509,6 +539,8 @@ function App() {
   // ######################   アイデアの生成 ######################
   // AIによる新しいアイデアを生成する関数
   const generateNewIdea = async (x = 450, y = 100) => {
+    if (handleIfReducingModeActive()) return; // trueが返ってきたらここで処理中断
+
     console.log('AIによるアイデア生成を開始します...');
     setLoading(true); // Start the loading indicator
 
@@ -555,6 +587,8 @@ function App() {
 
   // ######################   要素アイデアの生成 ######################
   const generateIdeaSeeds = async (x = 450, y = 100) => {
+    if (handleIfReducingModeActive()) return; // trueが返ってきたらここで処理中断
+
     console.log('AIによるアイデアの種生成を開始します...');
     setLoading(true); // Start the loading indicator
 
@@ -694,6 +728,137 @@ function App() {
     document.body.removeChild(link);
   };
 
+  // 削減モードかどうかを判定
+  const isReducingModeActive = notes.some(n => n.isReducing === true);
+
+  // 削減モード用バウンディングボックス計算
+  let boxX = 0, boxY = 0, boxWidth = 0, boxHeight = 0;
+  if (isReducingModeActive) {
+    const reducingNotes = notes.filter(n => n.isReducing);
+    if (reducingNotes.length > 0) {
+      const padding = 10; // 枠線周囲の余白
+
+      // 各ノートのBounding Boxを計算
+      const noteBounds = reducingNotes.map(n => {
+        const noteW = (n.shape === 'circle') ? 80 : 120; 
+        const noteH = (n.shape === 'circle') ? 80 : 120;
+        return {
+          x1: n.x,
+          y1: n.y,
+          x2: n.x + noteW,
+          y2: n.y + noteH
+        };
+      });
+
+      const minX = Math.min(...noteBounds.map(b => b.x1));
+      const minY = Math.min(...noteBounds.map(b => b.y1));
+      const maxX = Math.max(...noteBounds.map(b => b.x2));
+      const maxY = Math.max(...noteBounds.map(b => b.y2));
+
+      boxX = minX - padding;
+      boxY = minY - padding;
+      boxWidth = (maxX - minX) + padding * 2;
+      boxHeight = (maxY - minY) + padding * 2;
+    }
+  }
+
+  const handleConfirmReduction = async () => {
+    console.log('確定ボタンが押されました（LLM連携）');
+
+    // 削減モード中のノートを検索
+    const reducingNotes = notes.filter(n => n.isReducing);
+
+    console.log('削減モード中のノート:', reducingNotes);
+
+    if (reducingNotes.length === 0) {
+      // 削減モードじゃない場合は何もしない
+      return;
+    }
+
+    // 元のアイデア付箋（黄色、shapeがsquareでisReducing=trueなものを想定）
+    const originalIdeaNote = reducingNotes.find(n => n.shape === 'square');
+
+    if (!originalIdeaNote) {
+      console.warn("元のアイデア付箋が見つかりません。");
+      // isReducingフラグ解除して終了
+      setNotes(prevNotes => prevNotes.map(n => ({ ...n, isReducing: false })));
+      return;
+    }
+
+    // 残った要素付箋（circleかつisReducing=true）を取得
+    const remainingElements = reducingNotes.filter(n => n.shape === 'circle');
+
+    // 「要素が1つも削除されない」状態を判定: 初期の要素数と現在残っている要素数が同じ
+    if (remainingElements.length === 3) {
+      console.log('要素が削除されていないため、何も変更せず終了');
+      setNotes(prevNotes => prevNotes.map(n => ({ ...n, isReducing: false, initialElementCount: undefined })));
+      return;
+    }
+
+    // remainingElementsが空でも正常動作とする仕様に基づき、そのままLLM呼び出し可
+    // TitleとDescriptionを利用するため、オブジェクト構造を整える
+    const elementsForPrompt = remainingElements.map(el => ({
+      Title: el.content,
+      Description: el.description || ""
+    }));
+
+    const language = i18next.language === 'en' ? '英語' : '日本語';
+    const prompt = rebuildIdeaPrompt(theme, elementsForPrompt, language);
+
+    console.log("Prompt for LLM:", prompt);
+
+    setLoading(true); // LLM問い合わせ前にローディング開始（既存のloading stateを想定）
+
+    try {
+      const responseText = await sendToLLM(prompt);
+
+      // LLM応答からideaオブジェクトを抽出
+      const match = responseText.match(/idea:\s*(\{.*\})/);
+      if (!match) {
+        console.error("Invalid response format from LLM:", responseText);
+        // isReducingフラグ解除して通常モードへ
+        setNotes(prevNotes => prevNotes.map(n => ({ ...n, isReducing: false })));
+        return;
+      }
+
+      const ideaObject = JSON.parse(match[1]);
+      if (!ideaObject.Title || !ideaObject.Description) {
+        console.error("Invalid idea format from LLM:", ideaObject);
+        // isReducingフラグ解除して通常モードへ
+        setNotes(prevNotes => prevNotes.map(n => ({ ...n, isReducing: false })));
+        return;
+      }
+
+      // もとのアイデア付箋を更新
+      setNotes(prevNotes => prevNotes.map(n => {
+        if (n.id === originalIdeaNote.id) {
+          return {
+            ...n,
+            content: ideaObject.Title,
+            description: ideaObject.Description,
+            isReducing: false
+          };
+        } else {
+          // 他のノートからもisReducingフラグを外す
+          return { ...n, isReducing: false };
+        }
+      }));
+
+    } catch (error) {
+      console.error("Error in handleConfirmReduction with LLM:", error);
+      // エラーハンドリング時もisReducingは外して終了
+      setNotes(prevNotes => prevNotes.map(n => ({ ...n, isReducing: false })));
+    } finally {
+      setLoading(false); // LLM問い合わせ終了後にローディング停止
+    }
+
+  };
+
+  const onDeleteElement = (id) => {
+    // idが一致するノートを削除
+    setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
+  };
+
 
   return (
     <>
@@ -756,10 +921,12 @@ function App() {
           backgroundColor: '#F2F2F2',
           backgroundImage: 'radial-gradient(#D2D2D2 1px, transparent 1px)', // グレードット柄
           backgroundSize: '20px 20px', // ドット間隔の設定
-          border: '1px solid #ddd',
+          // border: '1px solid #ddd',
+          // border: isReducingModeActive ? '2px solid blue' : '1px solid #ddd', // ★削減モード時に青い枠線
           boxSizing: 'border-box',
         }}
       >
+        
         <svg style={{ position: 'absolute', top: 0, left: 0, width: '3000px', height: '2000px', zIndex: 0 }}>
           {renderLinesBetweenNotes()}
         </svg>
@@ -783,6 +950,7 @@ function App() {
               setLastX={setLastXPosition} // 振る基準の位置をセットする
               bkcolor={note.bkcolor}
               onDelete={deleteNote} 
+              onDeleteElement={onDeleteElement} // 新たに追加
               onMove={moveNote} 
               onDrop={handleDrop} 
               onContentChange={updateNoteContent}  // 付箋内容の変更を反映する
@@ -790,8 +958,48 @@ function App() {
               isSelected={note.id === selectedNoteId}  // 選択されているかどうかを渡す
               onResize={handleResize} // リサイズ情報を受け取るコールバック関数を渡す
               resetResize={() => setResizedNotes([])} // 別の付箋がリサイズされた際にリセット
+              isReducing={note.isReducing}  // 付箋にisReducing情報を渡す
             />
           ))}
+          {/* 削減モードアクティブ時のみ、青い枠線と確定ボタンを表示 */}
+          {isReducingModeActive && (
+            <div style={{
+              position: 'absolute',
+              left: `${boxX}px`,
+              top: `${boxY}px`,
+              width: `${boxWidth}px`,
+              height: `${boxHeight}px`,
+              border: '2px solid #0B99FF',
+              boxSizing: 'border-box',
+              pointerEvents: 'none', // 枠線自身は操作しない
+              zIndex: 999 // 枠線をノートより前面へ
+            }}>
+              {/* 枠線内部に確定ボタンを配置（右下） */}
+              <div style={{
+                position: 'absolute',
+                right: '-80px',
+                bottom: '0px',
+                pointerEvents: 'auto' // ボタンはクリック可能
+              }}>
+                <button
+                  onClick={handleConfirmReduction}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#fff',
+                    color: '#1E1E1E',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    boxShadow: '0px 0px 5px rgba(0,0,0,0.2)',
+                    fontSize: '14px'
+                  }}
+                >
+                  確定
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </>

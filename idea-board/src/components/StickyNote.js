@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 // 1.付箋のシェイク（マジシャンみたいに付箋を振ったら内容が変化する）
 // 2.付箋の分離（LEGOブロックを取り外す際に実装した）
 
-const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, bkcolor, onContentChange, shape, onShakeDetected, isSelected, onClick, onResize, resetResize, borderLine }) => {
+const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, bkcolor, onContentChange, shape, onShakeDetected, isSelected, onClick, onResize, resetResize, borderLine, isReducing, onDeleteElement }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState(content);
   const [zIndex, setZIndex] = useState(1);  // 初期状態のz-indexは低い値に設定
@@ -340,6 +340,31 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
           }}
         >
           ×
+        </button>
+      )}
+      {isReducing && shape === 'circle' && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeleteElement(id); // 要素削除コールバック呼び出し
+          }}
+          style={{
+            position: 'absolute',
+            top: '-25px',
+            right: '5px',
+            backgroundColor: '#FFEFEF',
+            border: '1px solid #FF0000',
+            borderRadius: '10px',
+            width: '60px',
+            height: '20px',
+            fontSize: '12px',
+            lineHeight: '18px',
+            color: '#FF0000',
+            cursor: 'pointer',
+            textAlign: 'center',
+          }}
+        >
+          削減
         </button>
       )}
       {/* Display the popup if 'showPopup' is true and 'description' exists */}
