@@ -23,7 +23,7 @@ function App() {
   const [lastPair, setLastPair] = useState({ draggedId: null, targetId: null });
   // const [theme, setTheme] = useState('USJのマリオカートの待ち時間60分をお客さんに楽しんでもらうためには？');  // ブレストのお題を管理
   // const [theme, setTheme] = useState('USJのマリオカートのアトラクションには、90分の待ち時間があります。待っている人は座ることができず、来場者のほとんどが一緒に来た人と話して待つなどしています。しかし、その待ち時間の長さから退屈している来場者もちらほら見られます。パーク責任者であるあなたは『来場者が今より退屈しない待ち時間の体験』をデザインしてください。実現可能性はさほど考えず、自由な発想をしてください。');  // ブレストのお題を管理
-  const [theme, setTheme] = useState('10年後のコンビニエンスストアはどのように進化しているだろうか？'); // お題のデフォルト
+  const [theme, setTheme] = useState('10年後のコンビニエンスストアはどのように進化しているだろうか？（How will convenience stores evolve in the next 10 years?）'); // お題のデフォルト
   
   const [idCounter, setIdCounter] = useState(1);  // 追加するためのIDカウンター
   const [lastXPosition, setLastXPosition] = useState(null); // 振る基準位置のX座標
@@ -898,6 +898,7 @@ function App() {
       <Sidebar
         addStickyNote={addStickyNote}
         sendToLLM={sendToLLM}
+        theme={theme}
         setTheme={setTheme}
         addSeedNote={addSeedNote}
         generateNewIdea={generateNewIdea}

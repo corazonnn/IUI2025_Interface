@@ -4,6 +4,7 @@ import i18next from '../i18n'; // 追加
 import react_i18next from 'i18next';
 
 const Sidebar = ({
+  theme,
   addStickyNote,
   addSeedNote,
   sendToLLM,
@@ -21,9 +22,10 @@ const Sidebar = ({
   const [languageChanged, setLanguageChanged] = useState(false);
 
   const [isOpen, setIsOpen] = useState(true);  // デフォルトで開いた状態に設定
-  const [llmCommand, setLlmCommand] = useState('');
-  // const [theme, setLocalTheme] = useState('10年後のコンビニエンスストアはどのように進化しているだろうか？'); // お題のデフォルト
-  const [theme, setLocalTheme] = useState('How will convenience stores evolve in 10 years?');
+  // ここで過去はsetLocalThemeを使っていたが、themeはPropsとして受け取り、直接setThemeで更新する
+  const handleThemeChange = (e) => {
+    setTheme(e.target.value);
+  };
   const [isGenerating, setIsGenerating] = useState(false); // アイデア生成中の状態を管理
   const [name, setName] = useState(''); // 氏名の状態を追加
   const isMeasurement = false;
@@ -170,39 +172,21 @@ const Sidebar = ({
             borderTop: '1px solid #ddd',  // グレーの線を上部に追加
             marginBottom: '10px',  // 上下の余白
           }} />
-          {/* テキストエリアから通常のテキスト表示に変更 */}
-          <div style={{
-            width: '100%',
-            padding: '10px',
-            boxSizing: 'border-box',
-            marginBottom: '20px',
-            borderRadius: '5px',
-            backgroundColor: '#F8F9FA',  // 少しグレーの背景色にして視認性を高める  
-            border: '1px solid #ddd',
-            color: '#333',
-            lineHeight: '1.8',  // 行間を広げて読みやすくする
-            maxHeight: '200px',
-            overflowY: 'auto', // テキストが長い場合のスクロール対応
-            whiteSpace: 'pre-wrap',  // テキストの改行を保持
-            fontSize: '12px',
-          }}>
-            {theme}
-          </div>
-          {/* Divider */}
-          
-          {/* <textarea
+          <textarea
             value={theme}
-            onChange={handleThemeChange}  // お題変更時にテーマをセット
+            onChange={handleThemeChange}
             style={{
               width: '100%',
-              height: '150px',
+              height: '80px',
               padding: '10px',
               boxSizing: 'border-box',
               marginBottom: '10px',
               borderRadius: '5px',
+              border: '1px solid #ddd',
+              resize: 'none'
             }}
             placeholder="お題を入力してください..."
-          /> */}
+          />
           {/* 新しい付箋の作成、以下の付箋をキャンバス内にドラッグ&ドロップして新しい付箋を追加しよう */}
           <h3 style={{ marginBottom: '0px' }}>{i18next.t('Create a new sticky note')}</h3>
           <hr style={{
