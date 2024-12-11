@@ -804,17 +804,17 @@ function App() {
         n.id === id ? { ...n, content: ideaObject.Title, description: ideaObject.Description } : n
       ));
 
-      // replaceFlagをtrueに設定
-      setReplaceFlag(true);
 
     } catch (error) {
       console.error("Error in onReplaceElement LLM call:", error);
     } finally {
+      setReplaceFlag(true); // replaceFlagをtrueに設定
       setLoading(false); // LLM問い合わせ終了後にローディング停止
     }
   };
 
   const handleConfirmReduction = async () => {
+    console.log('replaceFlag:', replaceFlag);
     console.log('確定ボタンが押されました（LLM連携）');
 
     // 削減モード中のノートを検索
@@ -840,7 +840,7 @@ function App() {
     // 残った要素付箋（circleかつisReducing=true）を取得
     const remainingElements = reducingNotes.filter(n => n.shape === 'circle');
 
-    console.log('replaceFlag:', replaceFlag);
+    
 
     // 「要素が1つも削除されない」状態を判定: 初期の要素数と現在残っている要素数が同じ
     if (remainingElements.length === 3 && !replaceFlag) {
