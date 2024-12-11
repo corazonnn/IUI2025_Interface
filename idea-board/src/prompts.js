@@ -151,3 +151,22 @@ ${remainingElements.map(el => `- ${el.Title} (${el.Description})`).join('\n')}
 出力フォーマット:
 idea: { "Title": "新しいアイデアのタイトル", "Description": "新しいアイデアの詳細（1～3文）" }
 `;
+
+
+export const replaceElementPrompt = (theme, currentElementTitle, currentElementDescription, lng) => `
+次のタスクでは、下記のお題と現在の要素を参考に、要素を別の類似または関連性のある要素に置き換えてください。
+
+お題: ${theme}
+
+現在の要素:
+- Title: "${currentElementTitle}"
+- Description: "${currentElementDescription}"
+
+要求事項:
+- 上記の要素に代わる、新しい要素アイデア（TitleとDescription）を1つ考え出してください。
+- 元の要素と同じく、お題に沿った概念や特性を持つ関連性のある要素にしてください。
+- 出力は${lng}で、TitleとDescriptionを必ず以下のフォーマットで返してください。
+
+出力フォーマット:
+idea: { "Title": "新しい要素のタイトル", "Description": "新しい要素の詳細説明（1～3文）" }
+`;

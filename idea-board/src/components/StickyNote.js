@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 // 1.付箋のシェイク（マジシャンみたいに付箋を振ったら内容が変化する）
 // 2.付箋の分離（LEGOブロックを取り外す際に実装した）
 
-const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, bkcolor, onContentChange, shape, onShakeDetected, isSelected, onClick, onResize, resetResize, borderLine, isReducing, onDeleteElement }) => {
+const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, bkcolor, onContentChange, shape, onShakeDetected, isSelected, onClick, onResize, resetResize, borderLine, isReducing, onDeleteElement, onReplaceElement }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState(content);
   const [zIndex, setZIndex] = useState(1);  // 初期状態のz-indexは低い値に設定
@@ -343,29 +343,55 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
         </button>
       )}
       {isReducing && shape === 'circle' && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDeleteElement(id); // 要素削除コールバック呼び出し
-          }}
-          style={{
-            position: 'absolute',
-            top: '-25px',
-            right: '5px',
-            backgroundColor: '#FFEFEF',
-            border: '1px solid #FF0000',
-            borderRadius: '10px',
-            width: '30px',
-            height: '20px',
-            fontSize: '20px',
-            lineHeight: '18px',
-            color: '#FF0000',
-            cursor: 'pointer',
-            textAlign: 'center',
-          }}
-        >
-          ×
-        </button>
+        <>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteElement(id); // 要素削除コールバック呼び出し
+            }}
+            style={{
+              position: 'absolute',
+              top: '-25px',
+              right: '5px',
+              backgroundColor: '#FFEFEF',
+              border: '1px solid #FF0000',
+              borderRadius: '10px',
+              width: '30px',
+              height: '20px',
+              fontSize: '20px',
+              lineHeight: '18px',
+              color: '#FF0000',
+              cursor: 'pointer',
+              textAlign: 'center',
+            }}
+          >
+            ×
+          </button>
+          {/* 新たに入れ替えボタン追加 */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onReplaceElement(id); // 要素入れ替えコールバック呼び出し
+            }}
+            style={{
+              position: 'absolute',
+              top: '-25px',
+              right: '40px',
+              backgroundColor: '#EFFFFF',
+              border: '1px solid #00AAAA',
+              borderRadius: '10px',
+              width: '30px',
+              height: '20px',
+              fontSize: '16px',
+              lineHeight: '18px',
+              color: '#00AAAA',
+              cursor: 'pointer',
+              textAlign: 'center',
+            }}
+          >
+            ↺
+          </button>
+        </>
       )}
       {/* Display the popup if 'showPopup' is true and 'description' exists */}
       {showPopup && description && createPortal(

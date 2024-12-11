@@ -14,6 +14,7 @@ import {
   generateIdeaSeedPrompt,
   generateIdeaOnShakePrompt,
   rebuildIdeaPrompt,
+  replaceElementPrompt,
 } from './prompts'; // プロンプトをインポート
 
 
@@ -58,6 +59,8 @@ function App() {
 
   // 現在の言語を取得
   const currentLanguage = i18next.language;
+
+  const [replaceFlag, setReplaceFlag] = useState(false);
 
   const [, dropRef] = useDrop({
     accept: ['STICKY_NOTE','AI_IDEA'],
@@ -762,6 +765,55 @@ function App() {
     }
   }
 
+  // 要素の入れ替え機能
+  const onReplaceElement = async (id) => {
+    console.log(`onReplaceElement called with id: ${id}`);
+
+    // 1. 対象要素付箋を取得
+    const note = notes.find(n => n.id === id && n.isReducing && n.shape === 'circle');
+    if (!note) {
+      console.error("No valid element found for replacement.");
+      return;
+    }
+
+    // 2. プロンプト準備
+    const language = i18next.language === 'en' ? '英語' : '日本語';
+    const prompt = replaceElementPrompt(theme, note.content, note.description || "", language);
+
+    setLoading(true); // LLM問い合わせ前にローディング開始
+
+    try {
+      const responseText = await sendToLLM(prompt);
+
+      // 3. レスポンス解析
+      const match = responseText.match(/idea:\s*(\{.*\})/);
+      if (!match) {
+        console.error("Invalid response format from LLM:", responseText);
+        // この段階ではエラー時に何もしないで戻るのみ
+        return;
+      }
+
+      const ideaObject = JSON.parse(match[1]);
+      if (!ideaObject.Title || !ideaObject.Description) {
+        console.error("Invalid idea format from LLM:", ideaObject);
+        return;
+      }
+
+      // 4. ノートを更新: 該当ノートのcontentとdescriptionを新要素に置き換える
+      setNotes(prevNotes => prevNotes.map(n => 
+        n.id === id ? { ...n, content: ideaObject.Title, description: ideaObject.Description } : n
+      ));
+
+      // replaceFlagをtrueに設定
+      setReplaceFlag(true);
+
+    } catch (error) {
+      console.error("Error in onReplaceElement LLM call:", error);
+    } finally {
+      setLoading(false); // LLM問い合わせ終了後にローディング停止
+    }
+  };
+
   const handleConfirmReduction = async () => {
     console.log('確定ボタンが押されました（LLM連携）');
 
@@ -788,9 +840,12 @@ function App() {
     // 残った要素付箋（circleかつisReducing=true）を取得
     const remainingElements = reducingNotes.filter(n => n.shape === 'circle');
 
+    console.log('replaceFlag:', replaceFlag);
+
     // 「要素が1つも削除されない」状態を判定: 初期の要素数と現在残っている要素数が同じ
-    if (remainingElements.length === 3) {
+    if (remainingElements.length === 3 && !replaceFlag) {
       console.log('要素が削除されていないため、何も変更せず終了');
+      setReplaceFlag(false);
       setNotes(prevNotes => prevNotes.map(n => ({ ...n, isReducing: false, initialElementCount: undefined })));
       return;
     }
@@ -960,6 +1015,7 @@ function App() {
               onResize={handleResize} // リサイズ情報を受け取るコールバック関数を渡す
               resetResize={() => setResizedNotes([])} // 別の付箋がリサイズされた際にリセット
               isReducing={note.isReducing}  // 付箋にisReducing情報を渡す
+              onReplaceElement={onReplaceElement}
             />
           ))}
           {/* 削減モードアクティブ時のみ、青い枠線と確定ボタンを表示 */}
