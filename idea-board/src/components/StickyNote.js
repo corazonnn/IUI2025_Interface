@@ -355,16 +355,16 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
             backgroundColor: '#FFEFEF',
             border: '1px solid #FF0000',
             borderRadius: '10px',
-            width: '60px',
+            width: '30px',
             height: '20px',
-            fontSize: '12px',
+            fontSize: '20px',
             lineHeight: '18px',
             color: '#FF0000',
             cursor: 'pointer',
             textAlign: 'center',
           }}
         >
-          削減
+          ×
         </button>
       )}
       {/* Display the popup if 'showPopup' is true and 'description' exists */}
