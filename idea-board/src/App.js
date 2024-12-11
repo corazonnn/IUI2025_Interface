@@ -489,7 +489,7 @@ function App() {
           content: `${concept.Title}`, // TitleとDescriptionを結合→${concept.Title}\n${concept.Description}
           description: `${concept.Description}`,
           x: note.x + offset,
-          y: note.y + 150,
+          y: note.y + 200,
           bkcolor: '#9EDCFA',
           shape: 'circle', // 丸い付箋として追加,
           borderLine: '2px solid #000000',
