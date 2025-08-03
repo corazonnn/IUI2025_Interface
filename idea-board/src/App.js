@@ -484,9 +484,9 @@ function App() {
       // 4. それぞれの概念に対して新しい付箋を追加
       const newNotes = conceptsArray.map((concept, index) => {
         let offset = 0;
-        if (index === 0) offset = -90;
+        if (index === 0) offset = -140;
         if (index === 1) offset = 10;
-        if (index === 2) offset = 130;
+        if (index === 2) offset = 180;
         return {
           id: idCounter + index, // ユニークなIDを設定
           content: `${concept.Title}`, // TitleとDescriptionを結合→${concept.Title}\n${concept.Description}
@@ -674,6 +674,9 @@ function App() {
     const csvContent = generateCSV(finalIdeaCount, finalSeedCount);
     downloadCSV(csvContent);
 
+    // 全てのアイデアを別のCSVファイルとして出力
+    generateIdeasCSV();
+
     // カウンターと氏名をリセット
     setCounts({
       combineStickyNotes: 0,
@@ -685,6 +688,46 @@ function App() {
     });
     setUserName('');
   };
+
+  // アイデアのリストをCSVとしてエクスポートする関数
+  const generateIdeasCSV = () => {
+    const header = ['ID', 'Content', 'Description', 'Shape', 'X', 'Y', 'Color'];
+    const csvRows = [header.join(',')]; // ヘッダーを追加
+
+    // notes配列をループして行を作成
+    notes.forEach(note => {
+      const row = [
+        note.id,
+        `"${note.content.replace(/"/g, '""')}"`, // CSVエスケープ
+        `"${note.description.replace(/"/g, '""')}"`, // CSVエスケープ
+        note.shape,
+        note.x,
+        note.y,
+        note.bkcolor,
+      ];
+      csvRows.push(row.join(','));
+    });
+
+    // CSVデータをBlobとして生成
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+    // ファイル名を設定
+    const date = new Date();
+    const dateString = date.toISOString().slice(0, 10).replace(/-/g, '');
+    const fileName = `Ideas_${userName}_${dateString}.csv`;
+
+    // ダウンロードリンクを作成してクリック
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
+
 
   // CSVファイルの生成
   const generateCSV = (finalIdeaCount, finalSeedCount) => {

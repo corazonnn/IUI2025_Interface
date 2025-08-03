@@ -11,9 +11,9 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState(content);
   const [zIndex, setZIndex] = useState(1);  // 初期状態のz-indexは低い値に設定
-  const [height, setHeight] = useState(shape === 'circle' ? 80 : 120); // shapeによって初期値を設定
-  const [width, setWidth] = useState(shape === 'circle' ? 80 : 120); // 幅の初期値も追加
-  const [fontSize, setFontSize] = useState(14); // 文字サイズの初期値
+  const [height, setHeight] = useState(shape === 'circle' ? 100 : 120); // shapeによって初期値を設定
+  const [width, setWidth] = useState(shape === 'circle' ? 100 : 120); // 幅の初期値も追加
+  const [fontSize, setFontSize] = useState(16); // 文字サイズの初期値
   const [showPopup, setShowPopup] = useState(false); // Pop-up visibility state
   const [showAddDescription, setShowAddDescription] = useState(false); // State for showing 'Add Description'
   const [newDescription, setNewDescription] = useState(description || ""); // State for editing new description
@@ -125,18 +125,18 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
       const padding = shape === 'circle' ? 1 : 10;
 
       // 1. まずフォントサイズを調整
-      if (scrollHeight > height - padding * 2) {
-        if (fontSize > 10) {
-          setFontSize((prevFontSize) => prevFontSize - 1); // フォントサイズを1ずつ減らす
-          return; // フォントサイズの調整が優先されるので、ここで終了
-        }
-      }
+      // if (scrollHeight > height - padding * 2) {
+      //   if (fontSize > 10) {
+      //     setFontSize((prevFontSize) => prevFontSize - 1); // フォントサイズを1ずつ減らす
+      //     return; // フォントサイズの調整が優先されるので、ここで終了
+      //   }
+      // }
 
       // 2. フォントサイズを下げても収まらない場合、高さと幅を増やす
-      if (scrollHeight > height - padding) {
-        setHeight(scrollHeight + padding * 4); // 余裕を持たせて高さを調整
-        setWidth(scrollHeight + padding * 4); // 余裕を持たせて幅を調整
-      }
+      // if (scrollHeight > height - padding) {
+      //   setHeight(scrollHeight + padding * 4); // 余裕を持たせて高さを調整
+      //   setWidth(scrollHeight + padding * 4); // 余裕を持たせて幅を調整
+      // }
     }
   }, [noteContent, shape, fontSize, height, width]); // noteContentが変更されるたびに実行
 
@@ -408,7 +408,7 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
             width: '300px',
             zIndex: 9999,
             boxShadow: '0px 0px 10px rgba(0,0,0,0.2)',
-            fontSize: '12px',
+            fontSize: '14px',
           }}
         >
           {/* <strong>Description:</strong> */}
@@ -423,7 +423,7 @@ const StickyNote = ({ id, content,description, x, y, onDelete, onMove, onDrop, b
               borderRadius: '5px',
               color: '#848488',
               border: 'none', 
-              fontSize: '12px', 
+              fontSize: '14px', 
               cursor: 'pointer'
             }}
           >
